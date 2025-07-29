@@ -200,19 +200,28 @@ with st.form("query_form"):
 
 if submitted and user_query:
     with st.spinner("Đang phân tích câu hỏi của bạn..."):
-        time.sleep(1) # Giả lập thời gian xử lý
+        
+        # <<< THAY ĐỔI 2: Bắt đầu tính giờ >>>
+        start_time = time.monotonic()
         
         # Sử dụng router để dự đoán
         score, route_name = router.guide(user_query)
 
+        # <<< THAY ĐỔI 2: Kết thúc tính giờ và tính toán thời gian xử lý >>>
+        end_time = time.monotonic()
+        processing_time = end_time - start_time
+
         st.subheader("Kết quả phân tích:")
         
-        col1, col2 = st.columns(2)
+        # <<< THAY ĐỔI 3: Chia layout thành 3 cột và thêm metric thời gian >>>
+        col1, col2, col3 = st.columns(3)
         
         with col1:
             st.metric(label="Route được đề xuất", value=route_name.replace("_", " ").title())
         with col2:
-            st.metric(label="Điểm tương đồng (Cosine Similarity)", value=f"{score:.4f}")
+            st.metric(label="Điểm tương đồng", value=f"{score:.4f}")
+        with col3:
+            st.metric(label="Thời gian xử lý", value=f"{processing_time:.4f} giây")
 
         # Hiển thị giải thích về route được chọn
         if route_name == "products":
@@ -224,3 +233,5 @@ if submitted and user_query:
             
 elif submitted and not user_query:
     st.error("Vui lòng nhập một câu hỏi để thực hiện định tuyến.")
+
+
